@@ -1,0 +1,967 @@
+---
+title: "MAFAmily Algorithm"
+author: "Sergio Canete IV"
+date: "September 1, 2020"
+output:
+  slidy_presentation: default
+  ioslides_presentation: default
+  beamer_presentation: default
+note: Hello MAFA Board
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+#library(dbplyr)
+library(dplyr)
+library(ggplot2)
+library(readxl)
+#library(tidyverse)
+library(tidyr)
+```
+
+## R Markdown
+
+This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+## Important Points to Cover
+
+- MAFAmily Activeness and Experience
+- MAFAmily Hobbies and Interests
+- MAFAmily Algorithm and Point Breakdown
+- Other Notes
+
+## Data Cleaning
+
+- We have to clean the Data in order to use it.
+- Clean out the MAFAmilies that are Frozen and Disbanded (Most notably BASU POWER, Diamond Fam, Spamilya)
+
+```{r, echo = TRUE}
+practice <- read_excel("~/Downloads/practice.xlsx") 
+practice
+names(practice)
+
+new.names <- c("time", "mafamily", "name", "email", "pronouns", "school", "other", "act1", "act2", "act3", "act4", "act5")
+colnames(practice) <- new.names
+names(practice)
+
+practice <- practice %>%
+  select(name, mafamily, pronouns, school, other, act1, act2, act3, act4, act5)
+
+active <- practice %>%
+  filter(mafamily == "mafamily1" |
+         mafamily == "basu" |
+         mafamily == "filsace" |
+         mafamily == "fire" |
+         mafamily == "gucci" |
+         mafamily == "gwap" |
+         mafamily == "hit" |
+         mafamily == "pac" |
+         mafamily == "piso" |
+         mafamily == "pun" |
+         mafamily == "sinigang" |
+         mafamily == "spamilya" |
+         mafamily == "ubae")
+```
+
+## Results from the Cleaning
+
+We brought the number of recognized and active MAFAmily Members from 306 to 297.
+- Makisig, Diamond, Kusakin, ZamFam, Mighty Morphin Flower Rangers, ... have all been officially disbanded.
+
+```{r, echo = FALSE}
+# We brought the number of recognized and active MAFAmily Members from 306 to 297
+View(active)
+```
+
+
+## MAFAmily Activeness
+
+- Let's see what the overall MAFAmily experience is
+- Let's compare the experience between each MAFAmily
+
+```{r}
+# Data Cleaning
+active$mafamily <- factor(active$mafamily, levels = c("mafamily1", "basu", "filsace", "fire", "gucci", "gwap", "hit", "pac", "piso", "pun", "sinigang", "spamilya", "ubae"))
+active.total <- active %>%
+  count(mafamily) # Provides a count for how many people listed "anime" as an activity.
+active.total
+
+```
+
+## MAFAmily Hobbies and Interest Calculations
+
+- This was the most extensive work of coding I've done this whole week
+- 1000+ lines of code.
+- Nothing to really note for this, I just want my code to be seen, hahaha!
+
+```{r, echo = TRUE}
+##### Totals for each MAFAmily
+
+# Anime
+anime <- active %>%
+  filter(act1 == "Anime" | 
+         act2 == "Anime" | 
+         act3 == "Anime" | 
+         act4 == "Anime" | 
+         act5 == "Anime")
+anime.total <- anime %>%
+  count(mafamily) # Provides a count for how many people listed "anime" as an activity.
+
+
+
+# Attend a Party
+attend.a.party <- active %>%
+  filter(act1 == "Attend a Party" |
+         act2 == "Attend a Party" | 
+         act3 == "Attend a Party" | 
+         act4 == "Attend a Party" | 
+         act5 == "Attend a Party")
+attend.a.party.total <- attend.a.party %>%
+  count(mafamily)
+attend.a.party.total
+
+
+# Blogging
+blogging <- active %>%
+  filter(act1 == "Blogging" |
+           act2 == "Blogging" | 
+           act3 == "Blogging" | 
+           act4 == "Blogging" | 
+           act5 == "Blogging")
+blogging.total <- blogging %>%
+  count(mafamily)
+blogging.total
+
+
+# Clubbing
+clubbing <- active %>%
+  filter(act1 == "Clubbing" | 
+         act2 == "Clubbing" | 
+         act3 == "Clubbing" | 
+         act4 == "Clubbing" | 
+         act5 == "Clubbing")
+clubbing.total <- clubbing %>%
+  count(mafamily) 
+clubbing.total
+
+
+# Concert
+concert <- active %>%
+  filter(act1 == "Concert" | 
+           act2 == "Concert" | 
+           act3 == "Concert" | 
+           act4 == "Concert" | 
+           act5 == "Concert")
+concert.total <- concert %>%
+  count(mafamily) 
+concert.total
+
+
+# Cooking/Baking
+cooking <- active %>%
+  filter(act1 == "Cooking/Baking" | 
+           act2 == "Cooking/Baking" | 
+           act3 == "Cooking/Baking" | 
+           act4 == "Cooking/Baking" | 
+           act5 == "Cooking/Baking")
+cooking.total <- cooking %>%
+  count(mafamily) 
+cooking.total
+
+
+# Creative Writing
+creative.writing <- active %>%
+  filter(act1 == "Creative Writing" | 
+           act2 == "Creative Writing" | 
+           act3 == "Creative Writing" | 
+           act4 == "Creative Writing" | 
+           act5 == "Creative Writing")
+creative.writing.total <- creative.writing %>%
+  count(mafamily) 
+creative.writing.total
+
+
+# Dancing
+dancing <- active %>%
+  filter(act1 == "Dancing" | 
+           act2 == "Dancing" | 
+           act3 == "Dancing" | 
+           act4 == "Dancing" | 
+           act5 == "Dancing")
+dancing.total <- dancing %>%
+  count(mafamily) 
+dancing.total
+
+
+# Discuss Politics
+discuss.politics <- active %>%
+  filter(act1 == "Discuss Politics" | 
+           act2 == "Discuss Politics" | 
+           act3 == "Discuss Politics" | 
+           act4 == "Discuss Politics" | 
+           act5 == "Discuss Politics")
+discuss.politics.total <- discuss.politics %>%
+  count(mafamily) 
+discuss.politics.total
+
+
+# Eating
+eating <- active %>%
+  filter(act1 == "Eating" | 
+           act2 == "Eating" | 
+           act3 == "Eating" | 
+           act4 == "Eating" | 
+           act5 == "Eating")
+eating.total <- eating %>%
+  count(mafamily) 
+eating.total
+
+
+# Gardening
+gardening <- active %>%
+  filter(act1 == "Gardening" | 
+           act2 == "Gardening" | 
+           act3 == "Gardening" | 
+           act4 == "Gardening" | 
+           act5 == "Gardening")
+gardening.total <- gardening %>%
+  count(mafamily) 
+gardening.total
+
+
+# Knitting
+knitting <- active %>%
+  filter(act1 == "Knitting" | 
+           act2 == "Knitting" | 
+           act3 == "Knitting" | 
+           act4 == "Knitting" | 
+           act5 == "Knitting")
+knitting.total <- knitting %>%
+  count(mafamily) 
+knitting.total
+
+
+# Listen to Music
+listen.music <- active %>%
+  filter(act1 == "Listen to Music" | 
+           act2 == "Listen to Music" | 
+           act3 == "Listen to Music" | 
+           act4 == "Listen to Music" | 
+           act5 == "Listen to Music")
+listen.music.total <- listen.music %>%
+  count(mafamily) 
+listen.music.total
+
+
+# Listen to Podcasts
+listen.podcasts <- active %>%
+  filter(act1 == "Listen to Podcasts" | 
+           act2 == "Listen to Podcasts" | 
+           act3 == "Listen to Podcasts" | 
+           act4 == "Listen to Podcasts" | 
+           act5 == "Listen to Podcasts")
+listen.podcasts.total <- listen.podcasts %>%
+  count(mafamily) 
+listen.podcasts.total
+
+
+# Make Music
+make.music <- active %>%
+  filter(act1 == "Make Music" | 
+           act2 == "Make Music" | 
+           act3 == "Make Music" | 
+           act4 == "Make Music" | 
+           act5 == "Make Music")
+make.music.total <- make.music %>%
+  count(mafamily) 
+make.music.total
+
+
+# Meditation
+meditation <- active %>%
+  filter(act1 == "Meditation" | 
+           act2 == "Meditation" | 
+           act3 == "Meditation" | 
+           act4 == "Meditation" | 
+           act5 == "Meditation")
+meditation.total <- meditation %>%
+  count(mafamily) 
+meditation.total
+
+
+# Painting
+painting <- active %>%
+  filter(act1 == "Painting" | 
+           act2 == "Painting" | 
+           act3 == "Painting" | 
+           act4 == "Painting" | 
+           act5 == "Painting")
+painting.total <- painting %>%
+  count(mafamily) 
+painting.total
+
+
+# Photography
+photography <- active %>%
+  filter(act1 == "Photography" |
+           act2 == "Photography" |
+           act3 == "Photography" |
+           act4 == "Photography" |
+           act5 == "Photography" )
+photography.total <- photography %>%
+  count(mafamily)
+photography.total
+
+
+# Play board games
+board.games <- active %>%
+  filter(act1 == "Play board games" | 
+           act2 == "Play board games" | 
+           act3 == "Play board games" | 
+           act4 == "Play board games" | 
+           act5 == "Play board games")
+board.games.total <- board.games %>%
+  count(mafamily) 
+board.games.total
+
+
+# Play Card Games
+card.games <- active %>%
+  filter(act1 == "Play Card Games" | 
+           act2 == "Play Card Games" | 
+           act3 == "Play Card Games" | 
+           act4 == "Play Card Games" | 
+           act5 == "Play Card Games")
+card.games.total <- card.games %>%
+  count(mafamily) 
+card.games.total
+
+
+# Play sports
+sports <- active %>%
+  filter(act1 == "Play sports" | 
+           act2 == "Play sports" | 
+           act3 == "Play sports" | 
+           act4 == "Play sports" | 
+           act5 == "Play sports")
+sports.total <- sports %>%
+  count(mafamily) 
+sports.total
+
+
+# Play video games
+video.games <- active %>%
+  filter(act1 == "Play video games" | 
+           act2 == "Play video games" | 
+           act3 == "Play video games" | 
+           act4 == "Play video games" | 
+           act5 == "Play video games")
+video.games.total <- video.games %>%
+  count(mafamily) 
+
+
+# Play with Animals/Pets
+animals <- active %>%
+  filter(act1 == "Play with Animals/Pets" | 
+           act2 == "Play with Animals/Pets" | 
+           act3 == "Play with Animals/Pets" | 
+           act4 == "Play with Animals/Pets" | 
+           act5 == "Play with Animals/Pets")
+animals.total <- animals %>%
+  count(mafamily) 
+animals.total
+
+
+# Pray
+pray <- active %>%
+  filter(act1 == "Pray" | 
+           act2 == "Pray" | 
+           act3 == "Pray" | 
+           act4 == "Pray" | 
+           act5 == "Pray")
+pray.total <- pray %>%
+  count(mafamily) 
+pray.total
+
+
+# Read a Book
+read <- active %>%
+  filter(act1 == "Read Book" | 
+           act2 == "Read Book" | 
+           act3 == "Read Book" | 
+           act4 == "Read Book" | 
+           act5 == "Read Book")
+read.total <- read %>%
+  count(mafamily) 
+read.total
+
+
+# Sewing
+sewing <- active %>%
+  filter(act1 == "Sewing" | 
+           act2 == "Sewing" | 
+           act3 == "Sewing" | 
+           act4 == "Sewing" | 
+           act5 == "Sewing")
+sewing.total <- sewing %>%
+  count(mafamily) 
+sewing.total
+
+
+# Social Activism
+activism <- active %>%
+  filter(act1 == "Social Activism" | 
+           act2 == "Social Activism" | 
+           act3 == "Social Activism" | 
+           act4 == "Social Activism" | 
+           act5 == "Social Activism")
+activism.total <- activism %>%
+  count(mafamily) 
+activism.total
+
+
+# Social Media
+social.media <- active %>%
+  filter(act1 == "Social Media" | 
+           act2 == "Social Media" | 
+           act3 == "Social Media" | 
+           act4 == "Social Media" | 
+           act5 == "Social Media")
+social.media.total <- social.media %>%
+  count(mafamily) 
+social.media.total
+
+
+# Traveling
+traveling <- active %>%
+  filter(act1 == "Traveling" | 
+           act2 == "Traveling" | 
+           act3 == "Traveling" | 
+           act4 == "Traveling" | 
+           act5 == "Traveling")
+traveling.total <- traveling %>%
+  count(mafamily) 
+traveling.total
+
+
+# vlogging
+vlogging <- active %>%
+  filter(act1 == "Vlogging" | 
+           act2 == "Vlogging" | 
+           act3 == "Vlogging" | 
+           act4 == "Vlogging" | 
+           act5 == "Vlogging")
+vlogging.total <- vlogging %>%
+  count(mafamily) 
+vlogging.total
+
+
+
+# volunteering
+volunteering <- active %>%
+  filter(act1 == "Volunteering" | 
+           act2 == "Volunteering" | 
+           act3 == "Volunteering" | 
+           act4 == "Volunteering" | 
+           act5 == "Volunteering")
+volunteering.total <- volunteering %>%
+  count(mafamily) 
+volunteering.total
+
+
+# Watching Movies
+movies <- active %>%
+  filter(act1 == "Watching Movies" | 
+           act2 == "Watching Movies" | 
+           act3 == "Watching Movies" | 
+           act4 == "Watching Movies" | 
+           act5 == "Watching Movies")
+movies.total <- movies %>%
+  count(mafamily) 
+movies.total
+
+
+# Working out/Exercise
+exercise <- active %>%
+  filter(act1 == "Working out/Exercise" | 
+           act2 == "Working out/Exercise" | 
+           act3 == "Working out/Exercise" | 
+           act4 == "Working out/Exercise" | 
+           act5 == "Working out/Exercise")
+exercise.total <- exercise %>%
+  count(mafamily) 
+exercise.total
+
+
+# Yoga
+yoga <- active %>%
+  filter(act1 == "Yoga" | 
+           act2 == "Yoga" | 
+           act3 == "Yoga" | 
+           act4 == "Yoga" | 
+           act5 == "Yoga")
+yoga.total <- yoga %>%
+  count(mafamily) 
+yoga.total
+```
+
+
+## MAFAmily Hobbies and Interests Graph
+
+Here is a visual representation of each MAFAmily and their hobbies and interests. We can see which interests goes well for each MAFAmily, and this data will help MAFAmily Heads create events that their MAFAmilies want to do!
+
+List of Hobbies and Interests:
+
+- Activism
+- Animals (Play with Animals)
+- Anime
+- Attend a Party
+- Blogging
+- Board Games
+- Card Games
+- Clubbing
+- Concert
+- Cooking
+- Creative Writing
+- Dancing
+- Discuss Politics
+- Eating
+- Exercise
+- Gardening
+- Knitting
+- Listen to Music
+- Listen to Podcasts
+- Make Music
+- Meditation
+- Movies (Watch Movies)
+- Painting
+- Photography
+- Pray
+- Read
+- Sewing
+- Social Media
+- Sports
+- Traveling
+- Video Games (Play Video Games)
+- Vlogging
+- Volunteering
+- Yoga
+
+```{r, echo = FALSE}
+activism %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Activism in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+animals %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Animals in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+# Anime
+anime %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Anime in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+# Attend a Party
+attend.a.party %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Attend a Party in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+blogging %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Blogging in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+board.games %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Board Games in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+card.games %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Card Games in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+clubbing %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Clubbing in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+concert %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Concert in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+cooking %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Cooking in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+creative.writing %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Creative Writing in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+dancing %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Dancing in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+discuss.politics %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Discuss Politics in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+eating %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Eating in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+exercise %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Exercise in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+gardening %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Gardening in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+knitting %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Knitting in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+listen.music %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Listen to Music in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+listen.podcasts %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Listen to Podcast in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+make.music %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Make Music in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+meditation %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Meditation in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+movies %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Movies in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+painting %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Painting in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+photography %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Photography in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+pray %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Praying in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+read %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Reading in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+sewing %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Sewing in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+social.media %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Social Media in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+sports %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Sports in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+traveling %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Traveling in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+video.games %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Video Games in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+vlogging %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Vlogging in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+volunteering %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Volunteering in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+yoga %>%
+  ggplot(aes(x = mafamily, color = mafamily)) +
+    geom_bar() +
+    ggtitle("Frequency of Yoga in MAFAmilies") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+```
+
+
+
+## The Point System
+
+The MAFAmily Application contains a Second Section that will be the basis of the entirety of the MAFAmily Algorithm. Some of the questions are designed to be tie-breaker questions:
+
+- Please choose the word or phrase that best describes who you are in your friend group!
+- You're hosting a party, where do you go?
+- Out of these, which would be your spirit animal?
+- If you were a Power Ranger, which Ranger would you be?
+- Without knowing what the movie is about, which of these movie titles would you like to see?
+- Out of these names, which would you choose for your own band name?
+- Pick a number!
+
+Those and the other questions like them will be worth about 0.5 to 1 point. It's very miniscule compared to the other variables derived within the formula. These questions will provide some more weight to the formula:
+
+- Which quality would you value most in a MAFAmily?
+- How would you describe yourself?
+
+These two questions were purposely placed at the beginning of the Second Section because it was a way to indirectly psychologically prime the applicant to choose the MAFAmily Description that best suited their needs as a MAFAmily Member. The MAFAmily Heads provided a description of how they define their own MAFAmily. Their answers were broken down to two short descriptions to describe the MAFAmily (How would you describe yourself?) Then their answers were broken down even further to one important word that stood out from the rest. 
+
+These questions will provide significant points to the overall score of the MAFAmily Applicant. We want a MAFAmily Applicant to have some choice into what they are getting themselves into.
+
+## The Most Important Points
+
+The most important points of the formula will be derived from the Hobbies, Activities, and Interests question. One of the main pain points for inactive MAFAmily members was a point of friction in which a MAFAmily member was unable to connect with another individual in the MAFAmily. We hope that the MAFAmily Algorithm will be able to prioritize the placing of applicants with people they can enjoy their hobbies, activities, and interests with.
+
+## Breakdown of the MAFAmily Algorithm:
+
+- 0.5 to 1 Point for Tie Breaker Questions
+- 2.5 Points for the Priming Questions
+- 5 Points for Description 1
+- 10 Points for Description 2
+- x Points for Activities
+
+Example of the Point Breakdown for the Activities section:
+
+MAFAmily A registered that they have 3 Members that enjoy watching *anime* and MAFAmily B registered that they have 5 Members that enjoy watching *anime*. A MAFAmily Applicant that marks *anime* as one of their main 5 hobbies will be awarded 3 Points as MAFAmily A and 5 Points as MAFAmily B.
+
+*See the Manual Algorithm Example*
+
+## Cons to the Point System
+
+Hobbies and Interest
+
+- The current point system heavily values quantity of active members in a MAFAmily
+- MAFAmilies with low Reregistration Data are at a disadvantage to MAFAmilies with high Reregistration Data.
+- The Outreach Team *did* extend the Deadline for the MAFAmily Reregistration Form
+- MAFAmilies without a cohesive activity are put at a disadvantage. MAFAmilies that feature a multitude of activities are less valued than MAFAmilies that share one common interest. 
+
+MAFAmily Head Description
+
+- Some MAFAmily Heads didn't go in-depth with their MAFAmily Descriptions
+- Longer descriptions are tending to do better and attract more adings.
+
+```{r}
+active.total
+```
+
+## Other Point Systems
+
+*A Rank System*
+
+- We could incorporate different tiers with every activity.
+
+Example:
+
+- MAFAmily A - 3 Anime Fans
+- MAFAmily B - 6 Anime Fans
+- MAFAmily C - 2 Anime Fans
+- MAFAmily D - 5 Anime Fans
+
+In the old system, MAFAmily B would have 6 points compared to A's 3, C's 2, and D's 5. In a Rank System, the MAFAmily with the highest total would receive 3 points, second highest would receive 2 points, and the third highest would receive 1 point. So, with this system, the point totals would look like this:
+
+- MAFAmily A - 1 Point
+- MAFAmily B - 3 Points
+- MAFAmily C - 0 Points
+- MAFAmily D - 2 Points
+
+One of the problem with this system is that Activities that aren't popular (Reading, Praying, and Yoga) are held to the same standard as activities that are popular (Anime, Eating, and Music). A MAFAmily that contains 8 members that enjoy Anime is held equal to a MAFAmily that contains 1 member that enjoy Yoga. (These are the actual highest totals for each category.) 
+
+The new problem becomes, would I rather talk/watch anime with 8 other people or practice Yoga with 1 person?
+
+One of the limitations for the Google Forms was that it was incapable of ranking the 5 Favorite Activities.
+
+
+*Other Systems*
+
+- A form of Percent System was thought of, but I'm limited by the knowledge of the R Language. 
+
+## Further Notes and Additional Study
+
+Upon further analysis of the MAFAmily Descriptions from each MAFAmily Head - the number one word that was most often seen was *supportive*. Out of the 23 *recognized* MAFAmily Heads that applied, 11 of them said something about how their MAFAmily is "supportive." In addition, 7 of the 12 MAFAmilies had at least one MAFAmily Head say that their MAFAmily was a supportive MAFAmily. 
+
+
+At the heart of each of these MAFAmilies is a group of individuals that want... that *need* support from others. The cause of this need may be derived from a lack of support in the household, need of assistance in career goals, tutoring help in academics, reinforcements in a video game, or maybe even just a friend to confide in. Whatever the reason, *supportive communities* and *supportive groups* is what the majority of the MAFAmily Heads believe is the definition of their MAFAmily, and, probably, of the MAFAmily Program. 
+
+
+Whether we want to adopt this into our MAFAmily Program statements, whether we want to capitilize and market our MAFAmily Program as a 'support,' 'supporting', or 'supportive' group, whether we want to incorporate this into our new MAFAmily Initiatives, or whether we want to rebrand the MAFAmily Program into something else is up for all of us to decide. 
+
+## Conclusion
+
+I didn't have time to create a demo of the MAFAmily Algorithm. I've been messing with some manual algorithm practice and writing out some Flow Diagrams for the code. There's a butt-load of considerations, and I'm thinking there's going to be a lot of if-else statements involved... I'll try to have that done by next week. 
+
+
+```{r}
+# Anime
+# Attend a Party
+# Blogging
+# Clubbing
+# Concert
+# Cooking/Baking
+# Creative Writing
+# Dancing
+# Discuss Politics
+# Eating
+# Gardening
+# Knitting
+# Listen to Music
+# Listen to Podcasts
+# Make Music
+# Painting
+# Photography
+# Play board games
+# Play Card Games
+# Play sports
+# Play video games
+# Play with Animals/Pets
+# Pray
+# Read Book
+# Sewing
+# Social Activism
+# Social Media
+# Traveling
+# Vlogging
+# Volunteering
+# Watching Movies
+# Working out/Exercise
+# Yoga
+```

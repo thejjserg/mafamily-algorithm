@@ -1,0 +1,875 @@
+---
+title: "FinalAlgorithm"
+author: "Sergio Canete IV"
+date: "10/15/2020"
+output: slidy_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+#library(dbplyr)
+library(dplyr)
+library(ggplot2)
+library(readxl)
+#library(tidyverse)
+library(tidyr)
+```
+
+## Algorithm
+
+These are the data points!
+
+```{r, echo = TRUE}
+application <- read_excel("~/Downloads/application.xlsx") 
+points <- application %>%
+  select(Name, act1:Part2, 'mafamily1':'ubae') # Select only the necessary parts for the MAFAmily Algorithm
+```
+
+## Points Formula
+
+- 0.5 to 1 Point for Tie Breaker Questions
+- 2.5 Points for the Priming Questions
+- 5 Points for Description 1
+- 5 Points for Description 2
+- x Points for Activities
+
+## Creating the Variables
+
+The problem that we initially had was that the beginning algorithm didn't know how to verify that if something was true for a given individual, then it had to add points to a specific group.
+
+*Visual Examples*
+
+```{r, echo = TRUE}
+# Create indicator column for each activity
+newfamily <- points %>%
+	mutate(
+		act_Anime = ifelse(act1 == "Anime" | act2 == "Anime" | act3 == "Anime" | act4 == "Anime" | act5 == "Anime", 1, 0),
+		act_Attend.Party = ifelse(act1 == "Attend a Party" | act2 == "Attend a Party" | act3 == "Attend a Party" | act4 == "Attend a Party" | act5 == "Attend a Party", 1, 0),
+	  act_Blogging = ifelse(act1 == "Blogging" | act2 == "Blogging" | act3 == "Blogging" | act4 == "Blogging" | act5 == "Blogging", 1, 0),
+		act_Clubbing = ifelse(act1 == "Clubbing" | act2 == "Clubbing" | act3 == "Clubbing" | act4 == "Clubbing" | act5 == "Clubbing", 1, 0),
+		act_Concert = ifelse(act1 == "Concert" | act2 == "Concert" | act3 == "Concert" | act4 == "Concert" | act5 == "Concert", 1, 0),
+		act_Cooking.Baking = ifelse(act1 == "Cooking/Baking" | act2 == "Cooking/Baking" | act3 == "Cooking/Baking" | act4 == "Cooking/Baking" | act5 == "Cooking/Baking", 1, 0),
+		act_Creative.Writing = ifelse(act1 == "Creative Writing" | act2 == "Creative Writing" | act3 == "Creative Writing" | act4 == "Creative Writing" | act5 == "Creative Writing", 1, 0),
+		act_Dancing = ifelse(act1 == "Dancing" | act2 == "Dancing" | act3 == "Dancing" | act4 == "Dancing" | act5 == "Dancing", 1, 0),
+		act_Discuss.Politics = ifelse(act1 == "Discuss Politics" | act2 == "Discuss Politics" | act3 == "Discuss Politics" | act4 == "Discuss Politics" | act5 == "Discuss Politics", 1, 0),
+		act_Eating = ifelse(act1 == "Eating" | act2 == "Eating" | act3 == "Eating" | act4 == "Eating" | act5 == "Eating", 1, 0),
+		act_Gardening = ifelse(act1 == "Gardening" | act2 == "Gardening" | act3 == "Gardening" | act4 == "Gardening" | act5 == "Gardening", 1, 0),
+		act_Knitting = ifelse(act1 == "Knitting" | act2 == "Knitting" | act3 == "Knitting" | act4 == "Knitting" | act5 == "Knitting", 1, 0),
+		act_Listen.Music = ifelse(act1 == "Listen to Music" | act2 == "Listen to Music" | act3 == "Listen to Music" | act4 == "Listen to Music" | act5 == "Listen to Music", 1, 0),
+		act_Listen.Podcasts = ifelse(act1 == "Listen to Podcasts" | act2 == "Listen to Podcasts" | act3 == "Listen to Podcasts" | act4 == "Listen to Podcasts" | act5 == "Listen to Podcasts", 1, 0),
+		act_Make.Music = ifelse(act1 == "Make Music" | act2 == "Make Music" | act3 == "Make Music" | act4 == "Make Music" | act5 == "Make Music", 1, 0),
+		act_Meditation = ifelse(act1 == "Meditation" | act2 == "Meditation" | act3 == "Meditation" | act4 == "Meditation" | act5 == "Meditation", 1, 0),
+		act_Painting = ifelse(act1 == "Painting" | act2 == "Painting" | act3 == "Painting" | act4 == "Painting" | act5 == "Painting", 1, 0),
+		act_Photography = ifelse(act1 == "Photography" | act2 == "Photography" | act3 == "Photography" | act4 == "Photography" | act5 == "Photography", 1, 0),
+		act_Play.Board.Games = ifelse(act1 == "Play board games" | act2 == "Play board games" | act3 == "Play board games" | act4 == "Play board games" | act5 == "Play board games", 1, 0),
+		act_Play.Card.Games = ifelse(act1 == "Play Card Games" | act2 == "Play Card Games" | act3 == "Play Card Games" | act4 == "Play Card Games" | act5 == "Play Card Games", 1, 0),
+		act_Play.Sports = ifelse(act1 == "Play sports" | act2 == "Play sports" | act3 == "Play sports" | act4 == "Play sports" | act5 == "Play sports", 1, 0),
+		act_Play.Video.Games = ifelse(act1 == "Play video games" | act2 == "Play video games" | act3 == "Play video games" | act4 == "Play video games" | act5 == "Play video games", 1, 0),
+		act_Play.Animals = ifelse(act1 == "Play with Animals/Pets" | act2 == "Play with Animals/Pets" | act3 == "Play with Animals/Pets" | act4 == "Play with Animals/Pets" | act5 == "Play with Animals/Pets", 1, 0),
+		act_Pray = ifelse(act1 == "Pray" | act2 == "Pray" | act3 == "Pray" | act4 == "Pray" | act5 == "Pray", 1, 0),
+		act_Read = ifelse(act1 == "Read Book" | act2 == "Read Book" | act3 == "Read Book" | act4 == "Read Book" | act5 == "Read Book", 1, 0),
+		act_Sewing = ifelse(act1 == "Sewing" | act2 == "Sewing" | act3 == "Sewing" | act4 == "Sewing" | act5 == "Sewing", 1, 0),
+		act_Social.Activism = ifelse(act1 == "Social Activism" | act2 == "Social Activism" | act3 == "Social Activism" | act4 == "Social Activism" | act5 == "Social Activism", 1, 0),
+		act_Social.Media = ifelse(act1 == "Social Media" | act2 == "Social Media" | act3 == "Social Media" | act4 == "Social Media" | act5 == "Social Media", 1, 0),
+		act_Traveling = ifelse(act1 == "Traveling" | act2 == "Traveling" | act3 == "Traveling" | act4 == "Traveling" | act5 == "Traveling", 1, 0),
+		act_Vlogging = ifelse(act1 == "Vlogging" | act2 == "Vlogging" | act3 == "Vlogging" | act4 == "Vlogging" | act5 == "Vlogging", 1, 0),
+		act_Volunteering = ifelse(act1 == "Volunteering" | act2 == "Volunteering" | act3 == "Volunteering" | act4 == "Volunteering" | act5 == "Volunteering", 1, 0),
+		act_Watching.Movies = ifelse(act1 == "Watching Movies" | act2 == "Watching Movies" | act3 == "Watching Movies" | act4 == "Watching Movies" | act5 == "Watching Movies", 1, 0),
+		act_Exercise = ifelse(act1 == "Working out/Exercise" | act2 == "Working out/Exercise" | act3 == "Working out/Exercise" | act4 == "Working out/Exercise" | act5 == "Working out/Exercise", 1, 0),
+		act_Yoga = ifelse(act1 == "Yoga" | act2 == "Yoga" | act3 == "Yoga" | act4 == "Yoga" | act5 == "Yoga", 1, 0),
+		
+		
+		####################
+		
+		
+		quality.mafamily1 = ifelse(Quality == "nice", 1, 0),
+		quality.basu = ifelse(Quality == "community", 1, 0),
+		quality.filsace = ifelse(Quality == "friendly", 1, 0),
+		quality.fire = ifelse(Quality == "laid back", 1, 0),
+		quality.gucci = ifelse(Quality == "dependable", 1, 0), 
+		quality.gwap = ifelse(Quality == "loving", 1, 0),
+		quality.hit = ifelse(Quality == "funny", 1, 0),
+		quality.pac = ifelse(Quality == "diverse", 1, 0),
+		quality.piso = ifelse(Quality == "caring", 1, 0),
+		quality.pun = ifelse(Quality == "creative", 1, 0),
+		quality.sinigang = ifelse(Quality == "kind", 1, 0),
+		quality.spamilya = ifelse(Quality == "energetic", 1, 0),
+		quality.ubae = ifelse(Quality == "understanding", 1, 0),
+		
+		description.1mafamily = ifelse(Description == "working to be the best I can be", 1, 0),
+		description.basu = ifelse(Description == "motivated and loving", 1, 0),
+		description.filsace = ifelse(Description == "looking for a good time", 1, 0),
+		description.fire = ifelse(Description == "lit and passionate", 1, 0),
+		description.gucci = ifelse(Description == "goofy and dope", 1, 0),
+		description.gwap = ifelse(Description == "enthusiastic and energetic", 1, 0),
+		description.hit = ifelse(Description == "wildly talented and caring", 1, 0),
+		description.pac = ifelse(Description == "engaging and appreciative", 1, 0),
+		description.piso = ifelse(Description == "mindful and warm-hearted", 1, 0),
+		description.pun = ifelse(Description == "fun, quirky, and a foodie", 1, 0),
+		description.sinigang = ifelse(Description == "proud but chill", 1, 0),
+		description.spamilya = ifelse(Description == "caring and weird but chill", 1, 0),
+		description.ubae = ifelse(Description == "cheerful and helpful", 1, 0),
+		
+		part1.1mafamily = ifelse(Part1 == "A", 1, 0),
+		part1.basu = ifelse(Part1 == "L", 1, 0),
+		part1.filsace = ifelse(Part1 == "B", 1, 0),
+		part1.fire = ifelse(Part1 == "C", 1, 0),
+		part1.gucci = ifelse(Part1 == "D", 1, 0),
+		part1.gwap = ifelse(Part1 == "E", 1, 0),
+		part1.hit = ifelse(Part1 == "F", 1, 0),
+		part1.pac = ifelse(Part1 == "G", 1, 0),
+		part1.piso = ifelse(Part1 == "H", 1, 0),
+		part1.pun = ifelse(Part1 == "I", 1, 0),
+		part1.sinigang = ifelse(Part1 == "J", 1, 0),
+		part1.spamilya = ifelse(Part1 == "M", 1, 0),
+		part1.ubae = ifelse(Part1 == "K", 1, 0),
+		
+		Part2.1mafamily = ifelse(Part2 == "K", 1, 0),
+		Part2.basu = ifelse(Part2 == "M", 1, 0),
+		Part2.filsace = ifelse(Part2 == "J", 1, 0),
+		Part2.fire = ifelse(Part2 == "I", 1, 0),
+		Part2.gucci = ifelse(Part2 == "H", 1, 0),
+		Part2.gwap = ifelse(Part2 == "G", 1, 0),
+		Part2.hit = ifelse(Part2 == "F", 1, 0),
+		Part2.pac = ifelse(Part2 == "E" | Part2 == "L", 1, 0),
+		Part2.piso = ifelse(Part2 == "D", 1, 0),
+		Part2.pun = ifelse(Part2 == "C", 1, 0),
+		Part2.sinigang = ifelse(Part2 == "B", 1, 0),
+		Part2.spamilya = ifelse(Part2 == "N", 1, 0),
+		Part2.ubae = ifelse(Part2 == "A", 1, 0),
+		
+		friend.1mafamily = ifelse(Friends == "the leader", 1, 0),
+		friend.basu = ifelse(Friends == "the powerful", 1, 0),
+		friend.filsace = ifelse(Friends == "the luxorious", 1, 0),
+		friend.fire = ifelse(Friends == "the hottest", 1, 0),
+		friend.gucci = ifelse(Friends == "the best style", 1, 0),
+		friend.gwap = ifelse(Friends == "the best looking", 1, 0),
+		friend.hit = ifelse(Friends == "the fighter", 1, 0),
+		friend.pac = ifelse(Friends == "the passionate", 1, 0),
+		friend.piso = ifelse(Friends == "the most successful", 1, 0),
+		friend.pun = ifelse(Friends == "the funniest", 1, 0), 
+		friend.sinigang = ifelse(Friends == "the smartest", 1, 0),
+		friend.spamilya = ifelse(Friends == "the dedicated", 1, 0),
+		friend.ubae = ifelse(Friends == "the baby", 1, 0),
+		
+		Color.1mafamily = ifelse(Color == "snow white", 1, 0),
+		Color.basu = ifelse(Color == "ocean cerulean", 1, 0),
+		Color.filsace = ifelse(Color == "magenta", 1, 0),
+		Color.fire = ifelse(Color == "crimson red", 1, 0),
+		Color.gucci = ifelse(Color == "mango tango orange", 1, 0),
+		Color.gwap = ifelse(Color == "shining gold", 1, 0),
+		Color.hit = ifelse(Color == "black shadow", 1, 0),
+		Color.pac = ifelse(Color == "azure blue", 1, 0),
+		Color.piso = ifelse(Color == "forest green", 1, 0),
+		Color.pun = ifelse(Color == "yellow lemon", 1, 0), 
+		Color.sinigang = ifelse(Color == "silver gray", 1, 0),
+		Color.spamilya = ifelse(Color == "bubblegum pink", 1, 0),
+		Color.ubae = ifelse(Color == "amethyst", 1, 0),
+		
+		Movie.1mafamily = ifelse(Movie == "The Missing Number", 1, 0),
+		Movie.basu = ifelse(Movie == "From Rags to Power", 1, 0),
+		Movie.filsace = ifelse(Movie == "The Ace Up the Sleeve", 1, 0),
+		Movie.fire = ifelse(Movie == "Flames of Victory", 1, 0),
+		Movie.gucci = ifelse(Movie == "The Good Gangsters", 1, 0),
+		Movie.gwap = ifelse(Movie == "When Handsome Meets the Beautiful", 1, 0),
+		Movie.hit = ifelse(Movie == "The Hard Hitter", 1, 0),
+		Movie.pac = ifelse(Movie == "The Return of the Champion", 1, 0),
+		Movie.piso = ifelse(Movie == "Adventures of the Lost Coin", 1, 0),
+		Movie.pun = ifelse(Movie == "Fun, Funnier, and Funniest", 1, 0), 
+		Movie.sinigang = ifelse(Movie == "It All Comes Together", 1, 0),
+		Movie.spamilya = ifelse(Movie == "The Lost Letter", 1, 0),
+		Movie.ubae = ifelse(Movie == "Growing Up", 1, 0),
+		
+		Band.1mafamily = ifelse(Band == "We Da Best", 1, 0),
+		Band.basu = ifelse(Band == "The Originals", 1, 0),
+		Band.filsace = ifelse(Band == "Against Sense", 1, 0),
+		Band.fire = ifelse(Band == "The Firefighters", 1, 0),
+		Band.gucci = ifelse(Band == "Better Beats", 1, 0),
+		Band.gwap = ifelse(Band == "Golden Sound", 1, 0),
+		Band.hit = ifelse(Band == "Hit-and-Run", 1, 0),
+		Band.pac = ifelse(Band == "Unified", 1, 0),
+		Band.piso = ifelse(Band == "The Pinchers", 1, 0),
+		Band.pun = ifelse(Band == "Squiggle-Giggles", 1, 0), 
+		Band.sinigang = ifelse(Band == "Squad-Quad", 1, 0),
+		Band.spamilya = ifelse(Band == "Junk Jams", 1, 0),
+		Band.ubae = ifelse(Band == "Babes Who Cry", 1, 0))
+
+newfamily2 <- newfamily %>%
+  select(Name, contains("act_"), contains("description."), contains("quality."), contains("part1."), contains("part2."), 'friend.1mafamily':'Band.ubae','mafamily1':'ubae')
+```
+
+## The ifelse() Method
+
+This isn't the most efficient method. This is actually the most time-consuming method and the method with the highest risk. 
+
+```{r, echo = TRUE}
+# Using the ifelse() Method
+
+placements <- newfamily2 %>%
+	mutate(
+	  mafamily1 = ifelse(act_Anime == 1, mafamily1 + 4, mafamily1),
+	  mafamily1 = ifelse(act_Attend.Party == 1, mafamily1 + 14, mafamily1),
+	  mafamily1 = ifelse(act_Blogging == 1, mafamily1 + 0, mafamily1),
+	  mafamily1 = ifelse(act_Clubbing == 1, mafamily1 + 4, mafamily1),
+	  mafamily1 = ifelse(act_Concert == 1, mafamily1 + 11, mafamily1),
+	  mafamily1 = ifelse(act_Cooking.Baking == 1, mafamily1 + 5, mafamily1),
+	  mafamily1 = ifelse(act_Creative.Writing == 1, mafamily1 + 1, mafamily1),
+	  mafamily1 = ifelse(act_Dancing == 1, mafamily1 + 8, mafamily1),
+	  mafamily1 = ifelse(act_Discuss.Politics == 1, mafamily1 + 1, mafamily1),
+	  mafamily1 = ifelse(act_Eating == 1, mafamily1 + 10, mafamily1),
+	  mafamily1 = ifelse(act_Gardening == 1, mafamily1 + 0, mafamily1),
+	  mafamily1 = ifelse(act_Knitting == 1, mafamily1 + 0, mafamily1),
+	  mafamily1 = ifelse(act_Listen.Music == 1, mafamily1 + 7, mafamily1),
+	  mafamily1 = ifelse(act_Listen.Podcasts == 1, mafamily1 + 1, mafamily1),
+		mafamily1 = ifelse(act_Make.Music == 1, mafamily1 + 1, mafamily1),
+		mafamily1 = ifelse(act_Meditation == 1, mafamily + 2, mafamily1),
+		mafamily1 = ifelse(act_Painting == 1, mafamily1 + 2, mafamily1),
+		mafamily1 = ifelse(act_Photography == 1, mafamily1 + 0, mafamily1),
+		mafamily1 = ifelse(act_Play.Board.Games == 1, mafamily1 + 0, mafamily1),
+		mafamily1 = ifelse(act_Play.Card.Games == 1, mafamily1 + 2, mafamily1),
+		mafamily1 = ifelse(act_Play.Sports == 1, mafamily1 + 3, mafamily1),
+		mafamily1 = ifelse(act_Play.Video.Games == 1, mafamily1 + 11, mafamily1),
+		mafamily1 = ifelse(act_Play.Animals == 1, mafamily1 + 1, mafamily1),
+		mafamily1 = ifelse(act_Pray == 1, mafamily1 + 0, mafamily1),
+		mafamily1 = ifelse(act_Read == 1, mafamily1 + 0, mafamily1),
+		mafamily1 = ifelse(act_Sewing == 1, mafamily1 + 1, mafamily1),
+		mafamily1 = ifelse(act_Social.Activism == 1, mafamily1 + 2, mafamily1),
+		mafamily1 = ifelse(act_Social.Media == 1, mafamily1 + 5, mafamily1),
+		mafamily1 = ifelse(act_Traveling == 1, mafamily1 + 8, mafamily1),
+		mafamily1 = ifelse(act_Vlogging == 1, mafamily1 + 2, mafamily1),
+		mafamily1 = ifelse(act_Volunteering == 1, mafamily1 + 0, mafamily1),
+		mafamily1 = ifelse(act_Watching.Movies == 1, mafamily1 + 3, mafamily1),
+		mafamily1 = ifelse(act_Exercise == 1, mafamily1 + 10, mafamily1),
+		mafamily1 = ifelse(act_Yoga == 1, mafamily1 + 0, mafamily1),
+		mafamily1 = ifelse(description.1mafamily == 1, mafamily1 + 2.5, mafamily1),
+		mafamily1 = ifelse(quality.mafamily1 == 1, mafamily1 + 2.5, mafamily1),
+		mafamily1 = ifelse(part1.1mafamily == 1, mafamily1 + 5, mafamily1),
+		mafamily1 = ifelse(Part2.1mafamily == 1, mafamily1 + 5, mafamily1),
+		mafamily1 = ifelse(friend.1mafamily == 1, mafamily1 + 0.5, mafamily1),
+		mafamily1 = ifelse(Color.1mafamily == 1, mafamily1 + 0.5, mafamily1),
+		mafamily1 = ifelse(Movie.1mafamily == 1, mafamily1 + 0.5, mafamily1),
+		mafamily1 = ifelse(Band.1mafamily == 1, mafamily1 + 0.5, mafamily1)) %>%
+ 
+  mutate(
+	  basu = ifelse(act_Anime == 1, basu + 7, basu),
+	  basu = ifelse(act_Attend.Party == 1, basu + 7, basu),
+	  basu = ifelse(act_Blogging == 1, basu + 0, basu),
+	  basu = ifelse(act_Clubbing == 1, basu + 3, basu),
+	  basu = ifelse(act_Concert == 1, basu + 7, basu),
+	  basu = ifelse(act_Cooking.Baking == 1, basu + 5, basu),
+	  basu = ifelse(act_Creative.Writing == 1, basu + 0, basu),
+	  basu = ifelse(act_Dancing == 1, basu + 4, basu),
+	  basu = ifelse(act_Discuss.Politics == 1, basu + 0, basu),
+	  basu = ifelse(act_Eating == 1, basu + 7, basu),
+	  basu = ifelse(act_Gardening == 1, basu + 0, basu),
+	  basu = ifelse(act_Knitting == 1, basu + 0, basu),
+	  basu = ifelse(act_Listen.Music == 1, basu + 8, basu),
+	  basu = ifelse(act_Listen.Podcasts == 1, basu + 1, basu),
+		basu = ifelse(act_Make.Music == 1, basu + 1, basu),
+		basu = ifelse(act_Meditation == 1, mafamily + 0, basu),
+		basu = ifelse(act_Painting == 1, basu + 0, basu),
+		basu = ifelse(act_Photography == 1, basu + 2, basu),
+		basu = ifelse(act_Play.Board.Games == 1, basu + 0, basu),
+		basu = ifelse(act_Play.Card.Games == 1, basu + 2, basu),
+		basu = ifelse(act_Play.Sports == 1, basu + 3, basu),
+		basu = ifelse(act_Play.Video.Games == 1, basu + 4, basu),
+		basu = ifelse(act_Play.Animals == 1, basu + 2, basu),
+		basu = ifelse(act_Pray == 1, basu + 0, basu),
+		basu = ifelse(act_Read == 1, basu + 0, basu),
+		basu = ifelse(act_Sewing == 1, basu + 1, basu),
+		basu = ifelse(act_Social.Activism == 1, basu + 2, basu),
+		basu = ifelse(act_Social.Media == 1, basu + 5, basu),
+		basu = ifelse(act_Traveling == 1, basu + 7, basu),
+		basu = ifelse(act_Vlogging == 1, basu + 1, basu),
+		basu = ifelse(act_Volunteering == 1, basu + 1, basu),
+		basu = ifelse(act_Watching.Movies == 1, basu + 1, basu),
+		basu = ifelse(act_Exercise == 1, basu + 6, basu),
+		basu = ifelse(act_Yoga == 1, basu + 0, basu),
+		basu = ifelse(description.basu == 1, basu + 2.5, basu),
+		basu = ifelse(quality.basu == 1, basu + 2.5, basu),
+		basu = ifelse(part1.basu == 1, basu + 5, basu),
+		basu = ifelse(Part2.basu == 1, basu + 5, basu),
+		basu = ifelse(friend.basu == 1, basu + 0.5, basu),
+		basu = ifelse(Color.basu == 1, basu + 0.5, basu),
+		basu = ifelse(Movie.basu == 1, basu + 0.5, basu),
+		basu = ifelse(Band.basu == 1, basu + 0.5, basu),
+		basu = basu*1.5) %>%
+  
+  
+  mutate(
+		filsace = ifelse(act_Anime == 1, filsace + 15, filsace),
+	  filsace = ifelse(act_Attend.Party == 1, filsace + 8, filsace),
+	  filsace = ifelse(act_Blogging == 1, filsace + 0, filsace),
+	  filsace = ifelse(act_Clubbing == 1, filsace + 4, filsace),
+	  filsace = ifelse(act_Concert == 1, filsace + 9, filsace),
+	  filsace = ifelse(act_Cooking.Baking == 1, filsace + 2, filsace),
+	  filsace = ifelse(act_Creative.Writing == 1, filsace + 1, filsace),
+	  filsace = ifelse(act_Dancing == 1, filsace + 7, filsace),
+	  filsace = ifelse(act_Discuss.Politics == 1, filsace + 0, filsace),
+	  filsace = ifelse(act_Eating == 1, filsace + 11, filsace),
+	  filsace = ifelse(act_Gardening == 1, filsace + 1, filsace),
+	  filsace = ifelse(act_Knitting == 1, filsace + 2, filsace),
+	  filsace = ifelse(act_Listen.Music == 1, filsace + 11, filsace),
+	  filsace = ifelse(act_Listen.Podcasts == 1, filsace + 1, filsace),
+		filsace = ifelse(act_Make.Music == 1, filsace + 1, filsace),
+		filsace = ifelse(act_Meditation == 1, filsace + 1, filsace),
+		filsace = ifelse(act_Painting == 1, filsace + 2, filsace),
+		filsace = ifelse(act_Photography == 1, filsace + 3, filsace),
+		filsace = ifelse(act_Play.Board.Games == 1, filsace + 1, filsace),
+		filsace = ifelse(act_Play.Card.Games == 1, filsace + 0, filsace),
+		filsace = ifelse(act_Play.Sports == 1, filsace + 5, filsace),
+		filsace = ifelse(act_Play.Video.Games == 1, filsace + 9, filsace),
+		filsace = ifelse(act_Play.Animals == 1, filsace + 3, filsace),
+		filsace = ifelse(act_Pray == 1, filsace + 0, filsace),
+		filsace = ifelse(act_Read == 1, filsace + 1, filsace),
+		filsace = ifelse(act_Sewing == 1, filsace + 0, filsace),
+		filsace = ifelse(act_Social.Activism == 1, filsace + 2, filsace),
+		filsace = ifelse(act_Social.Media == 1, filsace + 6, filsace),
+		filsace = ifelse(act_Traveling == 1, filsace + 3, filsace),
+		filsace = ifelse(act_Vlogging == 1, filsace + 1, filsace),
+		filsace = ifelse(act_Volunteering == 1, filsace + 3, filsace),
+		filsace = ifelse(act_Watching.Movies == 1, filsace + 3, filsace),
+		filsace = ifelse(act_Exercise == 1, filsace + 3, filsace),
+		filsace = ifelse(act_Yoga == 1, filsace + 1, filsace),
+		filsace = ifelse(description.filsace == 1, filsace + 2.5, filsace),
+		filsace = ifelse(quality.filsace == 1, filsace + 2.5, filsace),
+		filsace = ifelse(part1.filsace == 1, filsace + 5, filsace),
+		filsace = ifelse(Part2.filsace == 1, filsace + 5, filsace),
+		filsace = ifelse(friend.filsace == 1, filsace + 0.5, filsace),
+		filsace = ifelse(Color.filsace == 1, filsace + 0.5, filsace),
+		filsace = ifelse(Movie.filsace == 1, filsace + 0.5, filsace),
+		filsace = ifelse(Band.filsace == 1, filsace + 0.5, filsace)) %>%
+  mutate(
+		fire = ifelse(act_Anime == 1, fire + 12, fire),
+	  fire = ifelse(act_Attend.Party == 1, fire + 5, fire),
+	  fire = ifelse(act_Blogging == 1, fire + 1, fire),
+	  fire = ifelse(act_Clubbing == 1, fire + 1, fire),
+	  fire = ifelse(act_Concert == 1, fire + 3, fire),
+	  fire = ifelse(act_Cooking.Baking == 1, fire + 7, fire),
+	  fire = ifelse(act_Creative.Writing == 1, fire + 3, fire),
+	  fire = ifelse(act_Dancing == 1, fire + 4, fire),
+	  fire = ifelse(act_Discuss.Politics == 1, fire + 1, fire),
+	  fire = ifelse(act_Eating == 1, fire + 10, fire),
+	  fire = ifelse(act_Gardening == 1, fire + 0, fire),
+	  fire = ifelse(act_Knitting == 1, fire + 1, fire),
+	  fire = ifelse(act_Listen.Music == 1, fire + 17, fire),
+	  fire = ifelse(act_Listen.Podcasts == 1, fire + 1, fire),
+		fire = ifelse(act_Make.Music == 1, fire + 1, fire),
+		fire = ifelse(act_Meditation == 1, fire + 0, fire),
+		fire = ifelse(act_Painting == 1, fire + 1, fire),
+		fire = ifelse(act_Photography == 1, fire + 5, fire),
+		fire = ifelse(act_Play.Board.Games == 1, fire + 2, fire),
+		fire = ifelse(act_Play.Card.Games == 1, fire + 2, fire),
+		fire = ifelse(act_Play.Sports == 1, fire + 5, fire),
+		fire = ifelse(act_Play.Video.Games == 1, fire + 9, fire),
+		fire = ifelse(act_Play.Animals == 1, fire + 3, fire),
+		fire = ifelse(act_Pray == 1, fire + 1, fire),
+		fire = ifelse(act_Read == 1, fire + 1, fire),
+		fire = ifelse(act_Sewing == 1, fire + 2, fire),
+		fire = ifelse(act_Social.Activism == 1, fire + 4, fire),
+		fire = ifelse(act_Social.Media == 1, fire + 5, fire),
+		fire = ifelse(act_Traveling == 1, fire + 5, fire),
+		fire = ifelse(act_Vlogging == 1, fire + 4, fire),
+		fire = ifelse(act_Volunteering == 1, fire + 0, fire),
+		fire = ifelse(act_Watching.Movies == 1, fire + 14, fire),
+		fire = ifelse(act_Exercise == 1, fire + 5, fire),
+		fire = ifelse(act_Yoga == 1, fire + 0, fire),
+		fire = ifelse(description.fire == 1, fire + 2.5, fire),
+		fire = ifelse(quality.fire == 1, fire + 2.5, fire),
+		fire = ifelse(part1.fire == 1, fire + 5, fire),
+		fire = ifelse(Part2.fire == 1, fire + 5, fire),
+		fire = ifelse(friend.fire == 1, fire + 0.5, fire),
+		fire = ifelse(Color.fire == 1, fire + 0.5, fire),
+		fire = ifelse(Movie.fire == 1, fire + 0.5, fire),
+		fire = ifelse(Band.fire == 1, fire + 0.5, fire)) %>%
+  mutate(
+		gucci = ifelse(act_Anime == 1, gucci + 0, gucci),
+	  gucci = ifelse(act_Attend.Party == 1, gucci + 8, gucci),
+	  gucci = ifelse(act_Blogging == 1, gucci + 0, gucci),
+	  gucci = ifelse(act_Clubbing == 1, gucci + 2, gucci),
+	  gucci = ifelse(act_Concert == 1, gucci + 8, gucci),
+	  gucci = ifelse(act_Cooking.Baking == 1, gucci + 10, gucci),
+	  gucci = ifelse(act_Creative.Writing == 1, gucci + 0, gucci),
+	  gucci = ifelse(act_Dancing == 1, gucci + 2, gucci),
+	  gucci = ifelse(act_Discuss.Politics == 1, gucci + 1, gucci),
+	  gucci = ifelse(act_Eating == 1, gucci + 15, gucci),
+	  gucci = ifelse(act_Gardening == 1, gucci + 3, gucci),
+	  gucci = ifelse(act_Knitting == 1, gucci + 0, gucci),
+	  gucci = ifelse(act_Listen.Music == 1, gucci + 17, gucci),
+	  gucci = ifelse(act_Listen.Podcasts == 1, gucci + 1, gucci),
+		gucci = ifelse(act_Make.Music == 1, gucci + 3, gucci),
+		gucci = ifelse(act_Meditation == 1, gucci + 0, gucci),
+		gucci = ifelse(act_Painting == 1, gucci + 0, gucci),
+		gucci = ifelse(act_Photography == 1, gucci + 1, gucci),
+		gucci = ifelse(act_Play.Board.Games == 1, gucci + 1, gucci),
+		gucci = ifelse(act_Play.Card.Games == 1, gucci + 0, gucci),
+		gucci = ifelse(act_Play.Sports == 1, gucci + 1, gucci),
+		gucci = ifelse(act_Play.Video.Games == 1, gucci + 7, gucci),
+		gucci = ifelse(act_Play.Animals == 1, gucci + 2, gucci),
+		gucci = ifelse(act_Pray == 1, gucci + 0, gucci),
+		gucci = ifelse(act_Read == 1, gucci + 2, gucci),
+		gucci = ifelse(act_Sewing == 1, gucci + 0, gucci),
+		gucci = ifelse(act_Social.Activism == 1, gucci + 2, gucci),
+		gucci = ifelse(act_Social.Media == 1, gucci + 0, gucci),
+		gucci = ifelse(act_Traveling == 1, gucci + 8, gucci),
+		gucci = ifelse(act_Vlogging == 1, gucci + 0, gucci),
+		gucci = ifelse(act_Volunteering == 1, gucci + 3, gucci),
+		gucci = ifelse(act_Watching.Movies == 1, gucci + 10, gucci),
+		gucci = ifelse(act_Exercise == 1, gucci + 7, gucci),
+		gucci = ifelse(act_Yoga == 1, gucci + 0, gucci),
+		gucci = ifelse(description.gucci == 1, gucci + 2.5, gucci),
+		gucci = ifelse(quality.gucci == 1, gucci + 2.5, gucci),
+		gucci = ifelse(part1.gucci == 1, gucci + 5, gucci),
+		gucci = ifelse(Part2.gucci == 1, gucci + 5, gucci),
+		gucci = ifelse(friend.gucci == 1, gucci + 0.5, gucci),
+		gucci = ifelse(Color.gucci == 1, gucci + 0.5, gucci),
+		gucci = ifelse(Movie.gucci == 1, gucci + 0.5, gucci),
+		gucci = ifelse(Band.gucci == 1, gucci + 0.5, gucci)) %>%
+  mutate(
+		gwap = ifelse(act_Anime == 1, gwap + 9, gwap),
+	  gwap = ifelse(act_Attend.Party == 1, gwap + 5, gwap),
+	  gwap = ifelse(act_Blogging == 1, gwap + 0, gwap),
+	  gwap = ifelse(act_Clubbing == 1, gwap + 0, gwap),
+	  gwap = ifelse(act_Concert == 1, gwap + 3, gwap),
+	  gwap = ifelse(act_Cooking.Baking == 1, gwap + 4, gwap),
+	  gwap = ifelse(act_Creative.Writing == 1, gwap + 1, gwap),
+	  gwap = ifelse(act_Dancing == 1, gwap + 5, gwap),
+	  gwap = ifelse(act_Discuss.Politics == 1, gwap + 0, gwap),
+	  gwap = ifelse(act_Eating == 1, gwap + 8, gwap),
+	  gwap = ifelse(act_Gardening == 1, gwap + 1, gwap),
+	  gwap = ifelse(act_Knitting == 1, gwap + 0, gwap),
+	  gwap = ifelse(act_Listen.Music == 1, gwap + 11, gwap),
+	  gwap = ifelse(act_Listen.Podcasts == 1, gwap + 1, gwap),
+		gwap = ifelse(act_Make.Music == 1, gwap + 1, gwap),
+		gwap = ifelse(act_Meditation == 1, gwap + 1, gwap),
+		gwap = ifelse(act_Painting == 1, gwap + 4, gwap),
+		gwap = ifelse(act_Photography == 1, gwap + 7, gwap),
+		gwap = ifelse(act_Play.Board.Games == 1, gwap + 4, gwap),
+		gwap = ifelse(act_Play.Card.Games == 1, gwap + 4, gwap),
+		gwap = ifelse(act_Play.Sports == 1, gwap + 4, gwap),
+		gwap = ifelse(act_Play.Video.Games == 1, gwap + 4, gwap),
+		gwap = ifelse(act_Play.Animals == 1, gwap + 2, gwap),
+		gwap = ifelse(act_Pray == 1, gwap + 2, gwap),
+		gwap = ifelse(act_Read == 1, gwap + 3, gwap),
+		gwap = ifelse(act_Sewing == 1, gwap + 0, gwap),
+		gwap = ifelse(act_Social.Activism == 2, gwap + 1, gwap),
+		gwap = ifelse(act_Social.Media == 1, gwap + 10, gwap),
+		gwap = ifelse(act_Traveling == 1, gwap + 7, gwap),
+		gwap = ifelse(act_Vlogging == 1, gwap + 0, gwap),
+		gwap = ifelse(act_Volunteering == 1, gwap + 8, gwap),
+		gwap = ifelse(act_Watching.Movies == 1, gwap + 3, gwap),
+		gwap = ifelse(act_Exercise == 1, gwap + 4, gwap),
+		gwap = ifelse(act_Yoga == 1, gwap + 2, gwap),
+		gwap = ifelse(description.gwap == 1, gwap + 2.5, gwap),
+		gwap = ifelse(quality.gwap == 1, gwap + 2.5, gwap),
+		gwap = ifelse(part1.gwap == 1, gwap + 5, gwap),
+		gwap = ifelse(Part2.gwap == 1, gwap + 5, gwap),
+		gwap = ifelse(friend.gwap == 1, gwap + 0.5, gwap),
+		gwap = ifelse(Color.gwap == 1, gwap + 0.5, gwap),
+		gwap = ifelse(Movie.gwap == 1, gwap + 0.5, gwap),
+		gwap = ifelse(Band.gwap == 1, gwap + 0.5, gwap)) %>%
+	mutate(
+		hit = ifelse(act_Anime == 1, hit + 8, hit),
+	  hit = ifelse(act_Attend.Party == 1, hit + 10, hit),
+	  hit = ifelse(act_Blogging == 1, hit + 1, hit),
+	  hit = ifelse(act_Clubbing == 1, hit + 3, hit),
+	  hit = ifelse(act_Concert == 1, hit + 5, hit),
+	  hit = ifelse(act_Cooking.Baking == 1, hit + 9, hit),
+	  hit = ifelse(act_Creative.Writing == 1, hit + 2, hit),
+	  hit = ifelse(act_Dancing == 1, hit + 2, hit),
+	  hit = ifelse(act_Discuss.Politics == 1, hit + 1, hit),
+	  hit = ifelse(act_Eating == 1, hit + 15, hit),
+	  hit = ifelse(act_Gardening == 1, hit + 1, hit),
+	  hit = ifelse(act_Knitting == 1, hit + 1, hit),
+	  hit = ifelse(act_Listen.Music == 1, hit + 14, hit),
+	  hit = ifelse(act_Listen.Podcasts == 1, hit + 1, hit),
+		hit = ifelse(act_Make.Music == 1, hit + 1, hit),
+		hit = ifelse(act_Meditation == 1, hit + 0, hit),
+		hit = ifelse(act_Painting == 1, hit + 0, hit),
+		hit = ifelse(act_Photography == 1, hit + 1, hit),
+		hit = ifelse(act_Play.Board.Games == 1, hit + 1, hit),
+		hit = ifelse(act_Play.Card.Games == 1, hit + 0, hit),
+		hit = ifelse(act_Play.Sports == 1, hit + 10, hit),
+		hit = ifelse(act_Play.Video.Games == 1, hit + 6, hit),
+		hit = ifelse(act_Play.Animals == 1, hit + 2, hit),
+		hit = ifelse(act_Pray == 1, hit + 0, hit),
+		hit = ifelse(act_Read == 1, hit + 0, hit),
+		hit = ifelse(act_Sewing == 1, hit + 1, hit),
+		hit = ifelse(act_Social.Activism == 1, hit + 0, hit),
+		hit = ifelse(act_Social.Media == 1, hit + 6, hit),
+		hit = ifelse(act_Traveling == 1, hit + 13, hit),
+		hit = ifelse(act_Vlogging == 1, hit + 2, hit),
+		hit = ifelse(act_Volunteering == 1, hit + 1, hit),
+		hit = ifelse(act_Watching.Movies == 1, hit + 1, hit),
+		hit = ifelse(act_Exercise == 1, hit + 7, hit),
+		hit = ifelse(act_Yoga == 1, hit + 0, hit),
+		hit = ifelse(description.hit == 1, hit + 2.5, hit),
+		hit = ifelse(quality.hit == 1, hit + 2.5, hit),
+		hit = ifelse(part1.hit == 1, hit + 5, hit),
+		hit = ifelse(Part2.hit == 1, hit + 5, hit),
+		hit = ifelse(friend.hit == 1, hit + 0.5, hit),
+		hit = ifelse(Color.hit == 1, hit + 0.5, hit),
+		hit = ifelse(Movie.hit == 1, hit + 0.5, hit),
+		hit = ifelse(Band.hit == 1, hit + 0.5, hit)) %>%
+  mutate(
+		pac = ifelse(act_Anime == 1, pac + 10, pac),
+	  pac = ifelse(act_Attend.Party == 1, pac + 11, pac),
+	  pac = ifelse(act_Blogging == 1, pac + 0, pac),
+	  pac = ifelse(act_Clubbing == 1, pac + 1, pac),
+	  pac = ifelse(act_Concert == 1, pac + 7, pac),
+	  pac = ifelse(act_Cooking.Baking == 1, pac + 9, pac),
+	  pac = ifelse(act_Creative.Writing == 1, pac + 3, pac),
+	  pac = ifelse(act_Dancing == 1, pac + 1, pac),
+	  pac = ifelse(act_Discuss.Politics == 1, pac + 1, pac),
+	  pac = ifelse(act_Eating == 1, pac + 16, pac),
+	  pac = ifelse(act_Gardening == 1, pac + 0, pac),
+	  pac = ifelse(act_Knitting == 1, pac + 0, pac),
+	  pac = ifelse(act_Listen.Music == 1, pac + 9, pac),
+	  pac = ifelse(act_Listen.Podcasts == 1, pac + 0, pac),
+		pac = ifelse(act_Make.Music == 1, pac + 2, pac),
+		pac = ifelse(act_Meditation == 1, pac + 0, pac),
+		pac = ifelse(act_Painting == 1, pac + 5, pac),
+		pac = ifelse(act_Photography == 1, pac + 5, pac),
+		pac = ifelse(act_Play.Board.Games == 1, pac + 4, pac),
+		pac = ifelse(act_Play.Card.Games == 1, pac + 2, pac),
+		pac = ifelse(act_Play.Sports == 1, pac + 2, pac),
+		pac = ifelse(act_Play.Video.Games == 1, pac + 14, pac),
+		pac = ifelse(act_Play.Animals == 1, pac + 0, pac),
+		pac = ifelse(act_Pray == 1, pac + 0, pac),
+		pac = ifelse(act_Read == 1, pac + 2, pac),
+		pac = ifelse(act_Sewing == 1, pac + 0, pac),
+		pac = ifelse(act_Social.Activism == 1, pac + 2, pac),
+		pac = ifelse(act_Social.Media == 1, pac + 7, pac),
+		pac = ifelse(act_Traveling == 1, pac + 2, pac),
+		pac = ifelse(act_Vlogging == 1, pac + 2, pac),
+		pac = ifelse(act_Volunteering == 1, pac + 0, pac),
+		pac = ifelse(act_Watching.Movies == 1, pac + 1, pac),
+		pac = ifelse(act_Exercise == 1, pac + 2, pac),
+		pac = ifelse(act_Yoga == 1, pac + 0, pac),
+		pac = ifelse(description.pac == 1, pac + 2.5, pac),
+		pac = ifelse(quality.pac == 1, pac + 2.5, pac),
+		pac = ifelse(part1.pac == 1, pac + 5, pac),
+		pac = ifelse(Part2.pac == 1, pac + 5, pac),
+		pac = ifelse(friend.pac == 1, pac + 0.5, pac),
+		pac = ifelse(Color.pac == 1, pac + 0.5, pac),
+		pac = ifelse(Movie.pac == 1, pac + 0.5, pac),
+		pac = ifelse(Band.pac == 1, pac + 0.5, pac)) %>%
+  mutate(
+		piso = ifelse(act_Anime == 1, piso + 3, piso),
+	  piso = ifelse(act_Attend.Party == 1, piso + 5, piso),
+	  piso = ifelse(act_Blogging == 1, piso + 2, piso),
+	  piso = ifelse(act_Clubbing == 1, piso + 2, piso),
+	  piso = ifelse(act_Concert == 1, piso + 5, piso),
+	  piso = ifelse(act_Cooking.Baking == 1, piso + 3, piso),
+	  piso = ifelse(act_Creative.Writing == 1, piso + 1, piso),
+	  piso = ifelse(act_Dancing == 1, piso + 5, piso),
+	  piso = ifelse(act_Discuss.Politics == 1, piso + 0, piso),
+	  piso = ifelse(act_Eating == 1, piso + 9, piso),
+	  piso = ifelse(act_Gardening == 1, piso + 1, piso),
+	  piso = ifelse(act_Knitting == 1, piso + 0, piso),
+	  piso = ifelse(act_Listen.Music == 1, piso + 15, piso),
+	  piso = ifelse(act_Listen.Podcasts == 1, piso + 1, piso),
+		piso = ifelse(act_Make.Music == 1, piso + 2, piso),
+		piso = ifelse(act_Painting == 1, piso + 3, piso),
+		piso = ifelse(act_Photography == 1, piso + 5, piso),
+		piso = ifelse(act_Play.Board.Games == 1, piso + 2, piso),
+		piso = ifelse(act_Play.Card.Games == 1, piso + 0, piso),
+		piso = ifelse(act_Play.Sports == 1, piso + 4, piso),
+		piso = ifelse(act_Play.Video.Games == 1, piso + 7, piso),
+		piso = ifelse(act_Play.Animals == 1, piso + 4, piso),
+		piso = ifelse(act_Pray == 1, piso + 1, piso),
+		piso = ifelse(act_Read == 1, piso + 0, piso),
+		piso = ifelse(act_Sewing == 1, piso + 0, piso),
+		piso = ifelse(act_Social.Activism == 1, piso + 3, piso),
+		piso = ifelse(act_Social.Media == 1, piso + 8, piso),
+		piso = ifelse(act_Traveling == 1, piso + 18, piso),
+		piso = ifelse(act_Vlogging == 1, piso + 4, piso),
+		piso = ifelse(act_Volunteering == 1, piso + 3, piso),
+		piso = ifelse(act_Watching.Movies == 1, piso + 6, piso),
+		piso = ifelse(act_Exercise == 1, piso + 12, piso),
+		piso = ifelse(act_Yoga == 1, piso + 0, piso),
+		piso = ifelse(description.piso == 1, piso + 2.5, piso),
+		piso = ifelse(quality.piso == 1, piso + 2.5, piso),
+		piso = ifelse(part1.piso == 1, piso + 5, piso),
+		piso = ifelse(Part2.piso == 1, piso + 5, piso),
+		piso = ifelse(friend.piso == 1, piso + 0.5, piso),
+		piso = ifelse(Color.piso == 1, piso + 0.5, piso),
+		piso = ifelse(Movie.piso == 1, piso + 0.5, piso),
+		piso = ifelse(Band.piso == 1, piso + 0.5, piso)) %>%
+  mutate(
+		pun = ifelse(act_Anime == 1, pun + 12, pun),
+	  pun = ifelse(act_Attend.Party == 1, pun + 4, pun),
+	  pun = ifelse(act_Blogging == 1, pun + 0, pun),
+	  pun = ifelse(act_Clubbing == 1, pun + 1, pun),
+	  pun = ifelse(act_Concert == 1, pun + 7, pun),
+	  pun = ifelse(act_Cooking.Baking == 1, pun + 4, pun),
+	  pun = ifelse(act_Creative.Writing == 1, pun + 1, pun),
+	  pun = ifelse(act_Dancing == 1, pun + 2, pun),
+	  pun = ifelse(act_Discuss.Politics == 1, pun + 2, pun),
+	  pun = ifelse(act_Eating == 1, pun + 16, pun),
+	  pun = ifelse(act_Gardening == 1, pun + 0, pun),
+	  pun = ifelse(act_Knitting == 1, pun + 0, pun),
+	  pun = ifelse(act_Listen.Music == 1, pun + 17, pun),
+	  pun = ifelse(act_Listen.Podcasts == 1, pun + 2, pun),
+		pun = ifelse(act_Make.Music == 1, pun + 2, pun),
+		pun = ifelse(act_Meditation == 1, pun + 2, pun),
+		pun = ifelse(act_Painting == 1, pun + 1, pun),
+		pun = ifelse(act_Photography == 1, pun + 1, pun),
+		pun = ifelse(act_Play.Board.Games == 1, pun + 1, pun),
+		pun = ifelse(act_Play.Card.Games == 1, pun + 2, pun),
+		pun = ifelse(act_Play.Sports == 1, pun + 4, pun),
+		pun = ifelse(act_Play.Video.Games == 1, pun + 7, pun),
+		pun = ifelse(act_Play.Animals == 1, pun + 0, pun),
+		pun = ifelse(act_Pray == 1, pun + 4, pun),
+		pun = ifelse(act_Read == 1, pun + 1, pun),
+		pun = ifelse(act_Sewing == 1, pun + 0, pun),
+		pun = ifelse(act_Social.Activism == 1, pun + 1, pun),
+		pun = ifelse(act_Social.Media == 1, pun + 9, pun),
+		pun = ifelse(act_Traveling == 1, pun + 5, pun),
+		pun = ifelse(act_Vlogging == 1, pun + 0, pun),
+		pun = ifelse(act_Volunteering == 1, pun + 1, pun),
+		pun = ifelse(act_Watching.Movies == 1, pun + 3, pun),
+		pun = ifelse(act_Exercise == 1, pun + 10, pun),
+		pun = ifelse(act_Yoga == 1, pun + 0, pun),
+		pun = ifelse(description.pun == 1, pun + 2.5, pun),
+		pun = ifelse(quality.pun == 1, pun + 2.5, pun),
+		pun = ifelse(part1.pun == 1, pun + 5, pun),
+		pun = ifelse(Part2.pun == 1, pun + 5, pun),
+		pun = ifelse(friend.pun == 1, pun + 0.5, pun),
+		pun = ifelse(Color.pun == 1, pun + 0.5, pun),
+		pun = ifelse(Movie.pun == 1, pun + 0.5, pun),
+		pun = ifelse(Band.pun == 1, pun + 0.5, pun)) %>%
+  mutate(
+		sinigang = ifelse(act_Anime == 1, sinigang + 0, sinigang),
+	  sinigang = ifelse(act_Attend.Party == 1, sinigang + 7, sinigang),
+	  sinigang = ifelse(act_Blogging == 1, sinigang + 0, sinigang),
+	  sinigang = ifelse(act_Clubbing == 1, sinigang + 1, sinigang),
+	  sinigang = ifelse(act_Concert == 1, sinigang + 1, sinigang),
+	  sinigang = ifelse(act_Cooking.Baking == 1, sinigang + 7, sinigang),
+	  sinigang = ifelse(act_Creative.Writing == 1, sinigang + 2, sinigang),
+	  sinigang = ifelse(act_Dancing == 1, sinigang + 5, sinigang),
+	  sinigang = ifelse(act_Discuss.Politics == 1, sinigang + 4, sinigang),
+	  sinigang = ifelse(act_Eating == 1, sinigang + 3, sinigang),
+	  sinigang = ifelse(act_Gardening == 1, sinigang + 0, sinigang),
+	  sinigang = ifelse(act_Knitting == 1, sinigang + 0, sinigang),
+	  sinigang = ifelse(act_Listen.Music == 1, sinigang + 15, sinigang),
+	  sinigang = ifelse(act_Listen.Podcasts == 1, sinigang + 1, sinigang),
+		sinigang = ifelse(act_Make.Music == 1, sinigang + 6, sinigang),
+		sinigang = ifelse(act_Meditation == 1, sinigang + 1, sinigang),
+		sinigang = ifelse(act_Painting == 1, sinigang + 1, sinigang),
+		sinigang = ifelse(act_Photography == 1, sinigang + 2, sinigang),
+		sinigang = ifelse(act_Play.Board.Games == 1, sinigang + 1, sinigang),
+		sinigang = ifelse(act_Play.Card.Games == 1, sinigang + 1, sinigang),
+		sinigang = ifelse(act_Play.Sports == 1, sinigang + 9, sinigang),
+		sinigang = ifelse(act_Play.Video.Games == 1, sinigang + 7, sinigang),
+		sinigang = ifelse(act_Play.Animals == 1, sinigang + 2, sinigang),
+		sinigang = ifelse(act_Pray == 1, sinigang + 1, sinigang),
+		sinigang = ifelse(act_Read == 1, sinigang + 1, sinigang),
+		sinigang = ifelse(act_Sewing == 1, sinigang + 0, sinigang),
+		sinigang = ifelse(act_Social.Activism == 1, sinigang + 1, sinigang),
+		sinigang = ifelse(act_Social.Media == 1, sinigang + 4, sinigang),
+		sinigang = ifelse(act_Traveling == 1, sinigang + 2, sinigang),
+		sinigang = ifelse(act_Vlogging == 1, sinigang + 1, sinigang),
+		sinigang = ifelse(act_Volunteering == 1, sinigang + 1, sinigang),
+		sinigang = ifelse(act_Watching.Movies == 1, sinigang + 8, sinigang),
+		sinigang = ifelse(act_Exercise == 1, sinigang + 5, sinigang),
+		sinigang = ifelse(act_Yoga == 1, sinigang + 0, sinigang),
+		sinigang = ifelse(description.sinigang == 1, sinigang + 2.5, sinigang),
+		sinigang = ifelse(quality.sinigang == 1, sinigang + 2.5, sinigang),
+		sinigang = ifelse(part1.sinigang == 1, sinigang + 5, sinigang),
+		sinigang = ifelse(Part2.sinigang == 1, sinigang + 5, sinigang),
+		sinigang = ifelse(friend.sinigang == 1, sinigang + 0.5, sinigang),
+		sinigang = ifelse(Color.sinigang == 1, sinigang + 0.5, sinigang),
+		sinigang = ifelse(Movie.sinigang == 1, sinigang + 0.5, sinigang),
+		sinigang = ifelse(Band.sinigang == 1, sinigang + 0.5, sinigang),
+		sinigang = sinigang*1.25) %>%
+  
+  mutate(
+		spamilya = ifelse(act_Anime == 1, spamilya + 3, spamilya),
+	  spamilya = ifelse(act_Attend.Party == 1, spamilya + 3, spamilya),
+	  spamilya = ifelse(act_Blogging == 1, spamilya + 0, spamilya),
+	  spamilya = ifelse(act_Clubbing == 1, spamilya + 2, spamilya),
+	  spamilya = ifelse(act_Concert == 1, spamilya + 4, spamilya),
+	  spamilya = ifelse(act_Cooking.Baking == 1, spamilya + 2, spamilya),
+	  spamilya = ifelse(act_Creative.Writing == 1, spamilya + 0, spamilya),
+	  spamilya = ifelse(act_Dancing == 1, spamilya + 2, spamilya),
+	  spamilya = ifelse(act_Discuss.Politics == 1, spamilya + 2, spamilya),
+	  spamilya = ifelse(act_Eating == 1, spamilya + 4, spamilya),
+	  spamilya = ifelse(act_Gardening == 1, spamilya + 0, spamilya),
+	  spamilya = ifelse(act_Knitting == 1, spamilya + 0, spamilya),
+	  spamilya = ifelse(act_Listen.Music == 1, spamilya + 4, spamilya),
+	  spamilya = ifelse(act_Listen.Podcasts == 1, spamilya + 1, spamilya),
+		spamilya = ifelse(act_Make.Music == 1, spamilya + 1, spamilya),
+		spamilya = ifelse(act_Meditation == 1, spamilya + 0, spamilya),
+		spamilya = ifelse(act_Painting == 1, spamilya + 1, spamilya),
+		spamilya = ifelse(act_Photography == 1, spamilya + 2, spamilya),
+		spamilya = ifelse(act_Play.Board.Games == 1, spamilya + 1, spamilya),
+		spamilya = ifelse(act_Play.Card.Games == 1, spamilya + 1, spamilya),
+		spamilya = ifelse(act_Play.Sports == 1, spamilya + 4, spamilya),
+		spamilya = ifelse(act_Play.Video.Games == 1, spamilya + 3, spamilya),
+		spamilya = ifelse(act_Play.Animals == 1, spamilya + 1, spamilya),
+		spamilya = ifelse(act_Pray == 1, spamilya + 0, spamilya),
+		spamilya = ifelse(act_Read == 1, spamilya + 0, spamilya),
+		spamilya = ifelse(act_Sewing == 1, spamilya + 0, spamilya),
+		spamilya = ifelse(act_Social.Activism == 1, spamilya + 2, spamilya),
+		spamilya = ifelse(act_Social.Media == 1, spamilya + 3, spamilya),
+		spamilya = ifelse(act_Traveling == 1, spamilya + 4, spamilya),
+		spamilya = ifelse(act_Vlogging == 1, spamilya + 0, spamilya),
+		spamilya = ifelse(act_Volunteering == 1, spamilya + 0, spamilya),
+		spamilya = ifelse(act_Watching.Movies == 1, spamilya + 2, spamilya),
+		spamilya = ifelse(act_Exercise == 1, spamilya + 3, spamilya),
+		spamilya = ifelse(act_Yoga == 1, spamilya + 0, spamilya),
+		spamilya = ifelse(description.spamilya == 1, spamilya + 2.5, spamilya),
+		spamilya = ifelse(quality.spamilya == 1, spamilya + 2.5, spamilya),
+		spamilya = ifelse(part1.spamilya == 1, spamilya + 5, spamilya),
+		spamilya = ifelse(Part2.spamilya == 1, spamilya + 5, spamilya),
+		spamilya = ifelse(friend.spamilya == 1, spamilya + 0.5, spamilya),
+		spamilya = ifelse(Color.spamilya == 1, spamilya + 0.5, spamilya),
+		spamilya = ifelse(Movie.spamilya == 1, spamilya + 0.5, spamilya),
+		spamilya = ifelse(Band.spamilya == 1, spamilya + 0.5, spamilya),
+		spamilya = spamilya*2.5) %>%
+  
+  mutate(
+		ubae = ifelse(act_Anime == 1, ubae + 3, ubae),
+	  ubae = ifelse(act_Attend.Party == 1, ubae + 10, ubae),
+	  ubae = ifelse(act_Blogging == 1, ubae + 0, ubae),
+	  ubae = ifelse(act_Clubbing == 1, ubae + 0, ubae),
+	  ubae = ifelse(act_Concert == 1, ubae + 8, ubae),
+	  ubae = ifelse(act_Cooking.Baking == 1, ubae + 6, ubae),
+	  ubae = ifelse(act_Creative.Writing == 1, ubae + 0, ubae),
+	  ubae = ifelse(act_Dancing == 1, ubae + 2, ubae),
+	  ubae = ifelse(act_Discuss.Politics == 1, ubae + 0, ubae),
+	  ubae = ifelse(act_Eating == 1, ubae + 18, ubae),
+	  ubae = ifelse(act_Gardening == 1, ubae + 2, ubae),
+	  ubae = ifelse(act_Knitting == 1, ubae + 0, ubae),
+	  ubae = ifelse(act_Listen.Music == 1, ubae + 8, ubae),
+	  ubae = ifelse(act_Listen.Podcasts == 1, ubae + 1, ubae),
+		ubae = ifelse(act_Make.Music == 1, ubae + 1, ubae),
+		ubae = ifelse(act_Meditation == 1, ubae + 0, ubae),
+		ubae = ifelse(act_Painting == 1, ubae + 5, ubae),
+		ubae = ifelse(act_Photography == 1, ubae + 5, ubae),
+		ubae = ifelse(act_Play.Board.Games == 1, ubae + 0, ubae),
+		ubae = ifelse(act_Play.Card.Games == 1, ubae + 1, ubae),
+		ubae = ifelse(act_Play.Sports == 1, ubae + 10, ubae),
+		ubae = ifelse(act_Play.Video.Games == 1, ubae + 10, ubae),
+		ubae = ifelse(act_Play.Animals == 1, ubae + 2, ubae),
+		ubae = ifelse(act_Pray == 1, ubae + 0, ubae),
+		ubae = ifelse(act_Read == 1, ubae + 0, ubae),
+		ubae = ifelse(act_Sewing == 1, ubae + 1, ubae),
+		ubae = ifelse(act_Social.Activism == 1, ubae + 2, ubae),
+		ubae = ifelse(act_Social.Media == 1, ubae + 8, ubae),
+		ubae = ifelse(act_Traveling == 1, ubae + 10, ubae),
+		ubae = ifelse(act_Vlogging == 1, ubae + 1, ubae),
+		ubae = ifelse(act_Volunteering == 1, ubae + 3, ubae),
+		ubae = ifelse(act_Watching.Movies == 1, ubae + 6, ubae),
+		ubae = ifelse(act_Exercise == 1, ubae + 11, ubae),
+		ubae = ifelse(act_Yoga == 1, ubae + 1, ubae),
+		ubae = ifelse(description.ubae == 1, ubae + 2.5, ubae),
+		ubae = ifelse(quality.ubae == 1, ubae + 2.5, ubae),
+		ubae = ifelse(part1.ubae == 1, ubae + 5, ubae),
+		ubae = ifelse(Part2.ubae == 1, ubae + 5, ubae),
+		ubae = ifelse(friend.ubae == 1, ubae + 0.5, ubae),
+		ubae = ifelse(Color.ubae == 1, ubae + 0.5, ubae),
+		ubae = ifelse(Movie.ubae == 1, ubae + 0.5, ubae),
+		ubae = ifelse(Band.ubae == 1, ubae + 0.5, ubae)) %>%
+  select(Name, "mafamily1", "basu", "filsace", "fire", "gucci", "gwap", "hit", "pac", "piso", "pun", "sinigang", "spamilya", "ubae")
+View(placements)
+
+write.csv(placements, "placements.csv")
+```
+
+
+## Data
+
+Incorporating the Placements!
+
+```{r cars, echo = TRUE}
+data <- read_excel("~/Desktop/application2.xlsx") 
+
+placements <- data %>%
+  select(Name, contains("top"), 'mafamily1':'ubae')
+
+placements$top1 <- factor(placements$top1, levels = c("mafamily1", "filsace", "fire", "gucci", "gwap", "hit", "pac", "piso", "pun", "sinigang", "ubae"))
+placements$top2 <- factor(placements$top2, levels = c("mafamily1", "filsace", "fire", "gucci", "gwap", "hit", "pac", "piso", "pun", "sinigang", "ubae"))
+placements$top3 <- factor(placements$top3, levels = c("mafamily1", "filsace", "fire", "gucci", "gwap", "hit", "pac", "piso", "pun", "sinigang", "ubae"))
+
+View(placements)
+```
+
+## Tables
+
+```{r}
+placements %>%
+  count(top1) 
+
+placements %>%
+  count(top2)
+
+placements %>%
+  count(top3)
+```
+
+## Graphs
+```{r}
+practice <- read_excel("~/Desktop/practice.xlsx") 
+new.names <- c("MAFAmily", "name", "pronouns", "school", "other.school", "study", "career", "birthday", "enjoy.social", "far.away", "jump.convo", "rarely.introduce", "act1", "act2", "act3", "act4", "act5", "experience", "new")
+colnames(practice) <- new.names
+
+active <- practice %>%
+  select(name, study, career, MAFAmily, act1, act2, act3, act4, act5, experience, new) %>%
+  filter(MAFAmily == "#1MAFAmily" |
+         MAFAmily == "Filsace Fam" |
+         MAFAmily == "FIRE FAM" |
+         MAFAmily == "Gucci Gang" |
+         MAFAmily == "GWAPFAM" |
+         MAFAmily == "HITFAM" |
+         MAFAmily == "Pacquiao Fam" |
+         MAFAmily == "PISO FAM" |
+         MAFAmily == "PUNcit Fam" |
+         MAFAmily == "siniGANG" |
+         MAFAmily == "UBaE") %>%
+  filter(new == "No")
+
+new.names <- c('name', 'study', 'career', 'MAFAmily', 'act1', 'act2', 'act3', 'act4', 'act5', 'experience', 'new')
+colnames(active) <- new.names
+
+active.total <- active %>%
+  count(MAFAmily) # Provides a count for how many people listed "anime" as an activity.
+
+# Data Cleaning
+active$MAFAmily <- factor(active$MAFAmily, levels = c("#1MAFAmily", "Filsace Fam", "FIRE FAM", "Gucci Gang", "GWAPFAM", "HITFAM", "Pacquiao Fam", "PISO FAM", "PUNcit Fam", "siniGANG", "UBaE"))
+```
+```{r}
+active.total <- active %>%
+  count(MAFAmily) # Provides a count for how many people listed "anime" as an activity.
+active.total
+
+placements %>%
+  ggplot(aes(x = top1, color = top1)) +
+    geom_bar() +
+    ggtitle("Placements of MAFAmilies", subtitle = "Placement 1") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+placements %>%
+  ggplot(aes(x = top2, color = top2)) +
+    geom_bar() +
+    ggtitle("Placements of MAFAmilies", subtitle = "Placement 2") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+placements %>%
+  ggplot(aes(x = top3, color = top3)) +
+    geom_bar() +
+    ggtitle("Placements of MAFAmilies", subtitle = "Placement 3") +
+    xlab("MAFAmily") +
+    ylab("Frequency") +
+    coord_flip()
+
+```
+
+
+
+
